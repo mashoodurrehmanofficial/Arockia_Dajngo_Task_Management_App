@@ -108,7 +108,7 @@ def submit_chores(request):
       Transaction_Table(
         chore = x,
         user= user,
-        duration = 300,
+        duration = 30,
       ) 
     for x in records
     ])
