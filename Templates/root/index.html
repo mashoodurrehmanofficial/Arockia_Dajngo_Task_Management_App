@@ -1,0 +1,225 @@
+{% extends 'base.html' %}v
+{% block 'mainbody' %}
+
+<style>
+  .vertical-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+    .gradient1{
+      background-image: linear-gradient(to right top, #ff3048, #ff6133, #ff8b19, #ffb300, #ffd800);
+    }
+    
+</style>
+
+<br>
+
+<div>
+
+  <center>
+    {% if message  %}
+      <h4 class="green-text">{{message}}</h4>
+    {% endif %}
+  
+     {% if error  %}
+      <h4 class="red-text">{{error}}</h4>
+    {% endif %}
+  
+    
+  </center>
+  
+
+  <!-- Main Panel -->
+
+  {% if page_title == 'All Chores' %}
+    
+  {% else %}
+    
+  <div class="row">
+    <div class="col s12 m9 l9 ">
+      <p class="right"> <a href="/all_chore_list/">... See more</a>      </p>
+    </div>
+    <!-- <div class="col s12 m3 l3 "></div> -->
+  </div> 
+  {% endif %}
+  
+
+
+
+
+  <div class="row" style="margin:2px 10px">
+    <!-- Left Bar -->
+    <div class="col s12 m9 l9 ">
+      <div class="row">
+        {% for chore in chore_list %}
+          
+        <div id="{{chore.id}}" class="col s12 m4 l3" style="padding: 2px;">
+          <div class="chore_div"  id="{{chore.id}}" data-bg=" {{chore.background_color}}" style="background-color: rgb(145, 2, 145) ;height:200px;color:white;font-weight: bold;display: flex;flex-direction: row !important;align-items:center">
+          
+            
+                  <img style="padding:5px" width="100px" src="/Media/{{chore.icon}}" alt="{{chore.icon}}">
+                  
+                  <span style="padding:5px;font-size: 25px;text-align: center;">
+                    {{chore.chore_name}}
+                  </span>
+
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      
+    </div>
+    <!-- Right Bar -->
+    <div class="col s12 m3 l3 ">
+      <div style="padding:0px 2%">
+
+        <div class="" style="font-size: 25px;">
+          <i class="material-icons grey-text text-darken-3">shopping_cart</i>
+          <span> <b>Points</b> cart( <span id="total_cart_chores">{{total_cart_chores}}</span> )</span>
+        </div>
+
+
+      <div id="points_cart_all_records">
+        {% for chore in cart_data %}
+        <div style="font-weight: bold;display: flex;flex-direction: row !important;justify-content:space-between">
+                <img style="padding:5px" width="40px" height="40px" src="/Media/{{chore.1.icon}}" alt="">
+                <span style="padding:5px;font-size: 15px;text-align: justify;width: 50%">
+                  {{chore.1.chore_name}}  
+                </span>
+                <span style="padding:5px;font-size: 15px;text-align: center;">
+                  <span class="red-text">Points:</span> {{chore.1.points}}  
+                </span>
+                <span style="padding:5px;font-size: 15px;">
+                  <span class="red-text"> <i class="material-icons points_cart_delete" id="{{chore.0}}" style="cursor: pointer;">delete</i> </span> 
+                </span>
+        </div>
+      {% endfor %}
+      </div>
+
+      {% if cart_data %}
+      <div class="btn submit_chores_btn grey darken-3" style="width: 100%;">
+        Submit Tasks
+      </div>
+      {% else %}
+      <div class="btn submit_chores_btn grey darken-3" style="width: 100%;display:none">
+        Submit Tasks
+      </div>
+      {% endif %}
+
+          
+
+      </div>
+    </div>
+  </div>
+
+  
+</div>
+
+
+
+
+<script>
+$(document).ready(function(){
+  var chore_divs = $('.chore_div')
+  for(var i=0;i<chore_divs.length;i++){
+    var  bg =  $(chore_divs[i]).attr('data-bg')
+    $(chore_divs[i]).css('background-color',bg)
+  }
+})  
+
+$('.chore_div').click(function(){
+  var chore_id = this.id;
+  $.ajax({
+    url:'/points_cart_add/',
+    data: {'chore_id':chore_id},
+    method:"GET",
+    success: function(res){
+      var cart_data = res.cart_data
+      Render_Cart_Records(cart_data)
+
+    }
+  })
+})
+
+$('.points_cart_delete').click(function(){
+  var chore_id = this.id; 
+  $.ajax({
+    url:'/points_cart_delete/',
+    data: {'chore_id':chore_id},
+    method:"GET",
+    success: function(res){
+      var cart_data = res.cart_data
+      Render_Cart_Records(cart_data)
+    }
+  })
+})
+
+
+function Render_Cart_Records(cart_data){
+  if (cart_data.length>0){
+    $('.submit_chores_btn').show()
+  }else{
+    $('.submit_chores_btn').hide()
+  }
+  $('#total_cart_chores').html(cart_data.length)
+  $('#points_cart_all_records').html('')
+  for(var x=0;x<cart_data.length;x++){
+      $('#points_cart_all_records').append(`
+      <div style="font-weight: bold;display: flex;flex-direction: row !important;justify-content:space-between">
+        <img style="padding:5px" width="40px" height="40px" src="/Media/${cart_data[x][1].icon}" alt="">
+        <span style="padding:5px;font-size: 15px;text-align: justify;width: 50%">
+          
+          ${cart_data[x][1].chore_name} 
+        </span>
+        <span style="padding:5px;font-size: 15px;text-align: center;">
+          <span class="red-text">Points:</span> ${cart_data[x][1].points} 
+        </span>
+        <span style="padding:5px;font-size: 15px;">
+          <span class="red-text"> <i class="material-icons points_cart_delete" id="${cart_data[x][0]}" style="cursor: pointer;">delete</i> </span> 
+        </span>
+        </div>
+
+      `)
+    
+  }
+
+  $('.points_cart_delete').click(function(){
+    var chore_id = this.id; 
+    $.ajax({
+      url:'/points_cart_delete/',
+      data: {'chore_id':chore_id},
+      method:"GET",
+      success: function(res){
+        var cart_data = res.cart_data
+        Render_Cart_Records(cart_data)
+      }
+    })
+  })
+}
+
+$('.submit_chores_btn').click(function(){
+  $.ajax({
+    url:'/submit_chores/',
+    method:"GET",
+    success: function(res){
+      $('#points_cart_all_records').html('')
+      $('.submit_chores_btn').hide() 
+      $('#total_cart_chores').html('0')
+    }
+  })
+})
+
+
+
+
+</script>
+  
+
+
+ 
+
+
+{% endblock 'mainbody' %}
+{% block 'js' %}
+{% endblock 'js' %}
