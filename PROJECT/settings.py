@@ -201,10 +201,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 
-# 879545715675-dnu6nf0mbu8pus5ktjol8s2ou9pp1l3j.apps.googleusercontent.com
-# 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
-
-
-
-# 883372555886295
-# 29c4ad88ea0d8fe3c2e6aba3bb6a6ed0
